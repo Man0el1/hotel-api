@@ -1,17 +1,18 @@
 import { Sequelize } from '@sequelize/core'
 import { PostgresDialect } from '@sequelize/postgres'
 
-const sequelize = new Sequelize({
+export const sequelize = new Sequelize({
   dialect: PostgresDialect,
   database: 'hotel_api',
+  password: '',
   user: 'manoel',
   host: 'localhost',
-  port: 8080,
-  ssl: true,
+  port: 5432,
+  ssl: false,
   clientMinMessages: 'notice'
 })
 
-const connectToDatabase = async () => {
+export const connectToDatabase = async () => {
   try {
     await sequelize.authenticate();
     console.log("Conectado ao PostgreSQL com sucesso");
@@ -19,5 +20,3 @@ const connectToDatabase = async () => {
     console.log("Erro ao conectar ao PostgreSQL: "+ e);
   }
 }
-
-module.exports = { sequelize, connectToDatabase };

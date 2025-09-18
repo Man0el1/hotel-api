@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import './App.css'
 
@@ -6,9 +6,10 @@ export default function App() {
   const [tshirt, setTshirt] = useState(null);
 
   useEffect(() => {
-    fetch("https://localhost:8080/tshirt")
+    fetch("http://localhost:8080/tshirt")
       .then(res => res.json())
-      .then(data => setTshirt(data)); // data is the json we got back
+      .then(data => setTshirt(data)) // data is the json we got back
+      .catch(e => console.log(e));
   }, []);
 
   return (
