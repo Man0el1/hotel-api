@@ -16,7 +16,7 @@ app.get('/tshirt', (req, res) => {
   })
 });
 
-app.post('/tshirt/:id', (req, res) => {
+app.post('/tshirt/:id', (req, res) => { // example: localhost:8080/tshirt/123
   const { id } = req.params;
   const { logo } = req.body;
 

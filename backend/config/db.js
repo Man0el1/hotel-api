@@ -4,7 +4,7 @@ import { PostgresDialect } from '@sequelize/postgres'
 export const sequelize = new Sequelize({
   dialect: PostgresDialect,
   database: 'hotel_api',
-  password: '',
+  password: '12341234',
   user: 'manoel',
   host: 'localhost',
   port: 5432,
