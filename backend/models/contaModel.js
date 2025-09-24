@@ -18,6 +18,9 @@ export const Conta = sequelize.define('Conta', {
     onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   },
+  is_admin: {
+    type: DataTypes.BOOLEAN,
+  },
   nome: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -42,8 +45,11 @@ export const Conta = sequelize.define('Conta', {
     allowNull: false,
     validate: {is: /^[0-9]$/ }
   }
-})
+},{
+  tableName: "conta",
+  timestamps: false
+});
 
-Conta.belongsTo(Endereco, {foreignKey: 'id_endereco'}); // 1 conta pertence a 1 endereco
-Endereco.hasMany(Conta, {foreignKey: 'id_endereco'}); // 1 endereco pode ter n contas
+Conta.belongsTo(Endereco, { foreignKey: 'id_endereco' }); // 1 conta pertence a 1 endereco
+Endereco.hasMany(Conta, { foreignKey: 'id_endereco' }); // 1 endereco pode ter n contas
 // hasOne, hasMany, belongsTo, belongsToMany

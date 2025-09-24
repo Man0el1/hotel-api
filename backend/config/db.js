@@ -1,15 +1,11 @@
-import { Sequelize } from '@sequelize/core'
+import { Sequelize } from "sequelize";
 import { PostgresDialect } from '@sequelize/postgres'
 
-export const sequelize = new Sequelize({
-  dialect: PostgresDialect,
-  database: 'hotel_api',
-  password: '12341234',
-  user: 'manoel',
+export const sequelize = new Sequelize('hotel_api', 'manoel', '12341234', {
   host: 'localhost',
   port: 5432,
+  dialect: 'postgres',
   ssl: false,
-  clientMinMessages: 'notice'
 })
 
 export const connectToDatabase = async () => {

@@ -1,27 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import './App.css'
+import "./App.css";
+import Header from "./components/Header/Header.js";
+import HomePage from "./pages/HomePage/HomePage.js";
 
 export default function App() {
-  const [tshirt, setTshirt] = useState(null);
-
-  useEffect(() => {
-    fetch("http://localhost:8080/tshirt")
-      .then(res => res.json())
-      .then(data => setTshirt(data)) // data is the json we got back
-      .catch(e => console.log(e));
-  }, []);
-
   return (
-    <>
-      <div className="app">
-        <h1 className="title">API REST com Express</h1>
-        {tshirt && (
-          <p>
-            {tshirt.tshirt} - {tshirt.size}
-          </p>
-        )}
-      </div>
-    </>
+    <Router>
+      <Header />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+      </Routes>
+    </Router>
   );
 }

@@ -35,4 +35,7 @@ export const Endereco = sequelize.define('Endereco', {
   complemento: {
     type: DataTypes.STRING
   }
+},{
+  tableName: "conta_endereco",
+  timestamps: false //prevent createdAt and updatedAt appearing
 })
