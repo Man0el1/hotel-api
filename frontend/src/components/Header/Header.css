@@ -1,7 +1,28 @@
+a {
+  text-decoration: none;
+}
+
 .header {
-  display: flex;
   position: sticky;
   top: 0;
   right: 0;
   left: 0;
+}
+.navbar {
+  display: flex;
+  justify-content: flex-end;
+  text-decoration: none;
+  background-color: rgb(236, 218, 178);
+}
+
+.nav-item {
+  text-decoration: none;
+  font-size: 1.2rem;
+  padding: 10px;
+  list-style-type: none;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: black;
 }

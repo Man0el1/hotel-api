@@ -13,8 +13,8 @@ export default function HomePage() {
   }, []);
 
   return(
-    <div className="app">
-      <h1 className="title">API REST com Express</h1>
+    <div className="homePage">
+      <h1 className="title">pagina inicial</h1>
       {tshirt && (
         <p>
           {tshirt.tshirt} - {tshirt.size}
