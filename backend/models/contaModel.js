@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
-import { Endereco } from './contaEnderecoModel';
+import { Endereco } from './contaEnderecoModel.js';
 
 export const Conta = sequelize.define('Conta', {
   id_conta: {
@@ -32,18 +32,16 @@ export const Conta = sequelize.define('Conta', {
     validate: { isEmail: true }
   },
   senha: {
-    type: DataTypes.STRING(40),
+    type: DataTypes.STRING,
     allowNull: false
   },
   cpf: {
     type: DataTypes.STRING(11),
     allowNull: false,
-    validate: { is: /^[0-9]$/ }
   },
   telefone: {
     type: DataTypes.STRING,
     allowNull: false,
-    validate: {is: /^[0-9]$/ }
   }
 },{
   tableName: "conta",

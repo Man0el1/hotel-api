@@ -4,6 +4,7 @@ export default route;
 
 //controllers
 import { index, id_index } from './controllers/testController.js'
+import { register } from './controllers/loginController.js'
 
 //middlewares
 
@@ -13,3 +14,5 @@ import { index, id_index } from './controllers/testController.js'
 route.get('/tshirt', index);
 
 route.post('/tshirt/:id', id_index);
+
+route.post('/login/register/create', register);

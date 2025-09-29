@@ -1,14 +1,16 @@
 import express from 'express';
+import helmet from "helmet";
 import cors from 'cors';
 import routes from './routes.js'
-import { sequelize, connectToDatabase } from './config/db.js';
+import { connectToDatabase } from './config/db.js';
 const app = express();
 
 const PORT = 8080;
 
 app.use(cors({origin: "http://localhost:3000"}));
 app.use(express.json());
-app.use(routes)
+app.use(helmet());
+app.use(routes);
 
 const startServer = async () => {
   try {
