@@ -4,7 +4,7 @@ export default route;
 
 //controllers
 import { index, id_index } from './controllers/testController.js'
-import { register } from './controllers/loginController.js'
+import { register } from './controllers/registerController.js'
 
 //middlewares
 

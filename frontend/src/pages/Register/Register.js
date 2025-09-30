@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { validate as validadeCpf } from 'gerador-validador-cpf'
 
 import './Register.css'
 
@@ -26,16 +27,26 @@ export default function Register() {
   }
 
   const handleCepChange = (e) => { setCep(e.target.value.replace(/\D/g, "")); }
+  const handlePhoneChange = (e) => { setPhone(e.target.value.replace(/\D/g, "")); }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (!validadeCpf(cpf)) {
+        alert("Cpf inválido!");
+        return;
+      } else if (senha.length < 8) {
+        alert("Senha deve ter no mínimo 8 caracteres!");
+        return;
+      }
+
       let response = await fetch("http://localhost:8080/login/register/create", {
         method: "POST",
         headers: {'Content-Type': 'application/json'}, // indica que estamos enviando json
         body: JSON.stringify({name, email, senha, cpf, phone, cep, endereco, numero, complemento, bairro, cidade, estado})
       });
       let data = await response.json();
+
       if (response.status === 200) {
         alert("Conta criada com sucesso! Agora você pode fazer login.");
       } else {
@@ -46,32 +57,30 @@ export default function Register() {
     }
   }
 
-  useEffect(() => {
-    const fetchCep = async () => {
-      if(cep.length === 8){
-        try {
-          let response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-          let data = await response.json();
+  const fetchCep = async (e) => {
+    e.preventDefault();
+    if(cep.length === 8){
+      try {
+        let response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        let data = await response.json();
 
-          if(!data.erro) {
-            setComplemento(data.complemento);
-            setBairro(data.bairro);
-            setCidade(data.localidade);
-            setEstado(data.uf);
-          } else {
-            console.log('cep não existe');
-          }
-        } catch (e) {
-          console.log('fetch deu erro!');
+        if(!data.erro) {
+          setComplemento(data.complemento);
+          setBairro(data.bairro);
+          setCidade(data.localidade);
+          setEstado(data.uf);
+        } else {
+          alert('cep não existe');
         }
+      } catch (e) {
+        alert('fetch deu erro!');
       }
     }
-    fetchCep();
-  }, [cep]);
+  }
 
   return(
     <div className="registerPage">
-      <form className='form-email' onSubmit={handleSubmit}>
+      <form className='form-email'>
         <label htmlFor="name">Nome</label>
         <input value={name} onChange={(e) => setName(e.target.value)} maxLength='61' id='name' name='name' className='input' type='text' />
         
@@ -85,11 +94,12 @@ export default function Register() {
         <input value={cpf} onChange={(e) => setCpf(e.target.value)} maxLength='61' id='cpf' name='cpf' className='input' type='text' />
         
         <label htmlFor="phone">Telefone</label>
-        <input value={phone} onChange={(e) => setPhone(e.target.value)} maxLength='12' id='phone' name='phone' className='input' type='tel' />
+        <input value={phone} onChange={(e) => handlePhoneChange(e)} maxLength='12' id='phone' name='phone' className='input' type='tel' />
 
 
         <label htmlFor="cep">Cep</label>
         <input value={cep} onChange={(e) => handleCepChange(e)} maxLength='8' id='cep' name='cep' className='input' type='text' />
+        <button title="BuscarCep" className='' onClick={(e) => fetchCep(e)}>Buscar</button>
         
         <label htmlFor="endereco">Endereco</label>
         <input value={endereco} onChange={(e) => setEndereco(e.target.value)} maxLength='100' id='endereco' name='endereco' className='input' type='text' />
@@ -110,7 +120,7 @@ export default function Register() {
         <select value={estado} onChange={(e) => setEstado(e.target.value)} id='estado' name='estado' className='input' type='text'>
           {displayOptions()}
         </select>
-        <input className='submit' type='submit' value='Enviar' />
+        <input className='submit' type='submit' value='Enviar' onClick={handleSubmit} />
       </form>
     </div>
   ) 

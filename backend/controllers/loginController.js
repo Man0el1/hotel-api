@@ -1,45 +1,20 @@
 import { Conta } from "../models/contaModel.js";
-import { Endereco } from "../models/contaEnderecoModel.js";
 import bcrypt from 'bcrypt';
 
-const checkEmailExists = async (email) => {
+export const accountExists = async (req, res) => {
   try {
-    return await Conta.findOne({ where: { email: email}})
-  } catch (e) {
-    console.log("Erro ao verificar email: " + e);
-    throw new Error("Erro ao verificar email" + e);
-  }
-}
-
-export const register = async (req, res) => {
-  try {
-    const {name, email, senha, cpf, phone, cep, endereco, numero, complemento, bairro, cidade, estado} = req.body;
-    const lowercaseEmail = email.toLowerCase();
-
-    const emailExists = await checkEmailExists(lowercaseEmail);
-    if (emailExists) {
-      return res.status(400).json({message: "Email ja está cadastrado! Tente fazer login."});
-    }
-
-    const is_admin = (email === 'manoelgtcj@gmail.com'? true : false);
-    console.log("ai esta: " + isadmin);
+    const {email, senha} = req.body;
     const senhaHash = await bcrypt.hash(senha, 8);
 
-    const novoEndereco = await Endereco.create({
-      endereco, numero, cep, bairro, cidade, estado, complemento
-    });
+    const conta = await Conta.findOne({where: {email: email}})
+    if (!conta) return res.status(403).json({message: "Email ou senha errada."});
 
-    const novaConta = await Conta.create({
-      id_endereco: novoEndereco.id_endereco,
-      is_admin,
-      nome: name,
-      email: lowercaseEmail,
-      senha: senhaHash,
-      cpf,
-      telefone: phone
-    })
+    const senhaCorreta = await bcrypt.compare(senhaHash, conta.senha);
+    if (!senhaCorreta) return res.status(403).json({message: "Email ou senha errada."});
+
+    return res.status(200).json({message: "Login concluido."})
+
   } catch (e) {
-    console.log("Erro ao registrar conta: " + e);
-    res.status(500).json({message: "Erro no servidor ao registrar conta."});
+    return res.status(500).json({message: "Erro no servidor ao registrar conta."});
   }
 }

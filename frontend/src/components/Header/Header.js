@@ -13,7 +13,7 @@ export default function Header() {
           <a className="nav-link" href="/login">login</a>
         </li>
         <li className="nav-item">
-          <a className="nav-link" href="/sigma">sigma</a>
+          <a className="nav-link" href="/">home</a>
         </li>
       </ul>
     </div>
