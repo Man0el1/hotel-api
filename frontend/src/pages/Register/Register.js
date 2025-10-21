@@ -5,7 +5,7 @@ import './Register.css'
 
 export default function Register() {
 
-  const estados = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
+  const estados = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -19,6 +19,13 @@ export default function Register() {
   const [bairro, setBairro] = useState('');
   const [cidade, setCidade] = useState('');
   const [estado, setEstado] = useState('');
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      alert("você já está logado");
+      window.location.href = "/";
+    }
+  }, []);
 
   const displayOptions = () => {
     return estados.map((uf, index) => (
@@ -47,13 +54,15 @@ export default function Register() {
       });
       let data = await response.json();
 
-      if (response.status === 200) {
-        alert("Conta criada com sucesso! Agora você pode fazer login.");
+      if (response.status === 201) {
+        localStorage.setItem("token", data.token); 
+        alert(data.message);
+        window.location.href = "/";
       } else {
         alert(data.message);
       }
     } catch (e) {
-      console.log("erro no fetch: " + e);
+      alert("erro no fetch: " + e);
     }
   }
 

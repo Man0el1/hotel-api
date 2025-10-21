@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 import './Login.css'
 
+
 export default function Login() {
 
   const [email, setEmail] = useState('');
@@ -22,7 +23,7 @@ export default function Login() {
         alert(data.message);
       }
     } catch (e) {
-      console.log("erro no fetch: " + e);
+      console.log("erro no fetch");
     }
   }
 

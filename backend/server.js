@@ -3,6 +3,8 @@ import helmet from "helmet";
 import cors from 'cors';
 import routes from './routes.js'
 import { connectToDatabase } from './config/db.js';
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
 
 const PORT = 8080;
