@@ -60,6 +60,9 @@ export default function Register() {
         window.location.href = "/";
       } else {
         alert(data.message);
+        if (response.status === 403) {
+          window.location.href = "/";
+        }
       }
     } catch (e) {
       alert("erro no fetch: " + e);

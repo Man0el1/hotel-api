@@ -1,24 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
+
 
 import './Login.css'
-
 
 export default function Login() {
 
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
 
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      alert("você já está logado");
+      window.location.href = "/";
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      let response = await fetch("http://localhost:8080/login", {
+      let response = await fetch("http://localhost:8080/login/entry", {
         method: "POST",
         headers: {'Content-Type': 'application/json'}, // indica que estamos enviando json
         body: JSON.stringify({email, senha})
       });
       let data = await response.json();
       if (response.status === 200) {
-        alert(response.message);
+        localStorage.setItem("token", data.token); 
+        alert(data.message);
+        window.location.href = "/";
       } else {
         alert(data.message);
       }

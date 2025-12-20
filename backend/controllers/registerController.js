@@ -19,7 +19,7 @@ const checkCpfExists = async (cpf) => {
   }
 }
 
-export const register = async (req, res) => {
+export const registerAccount = async (req, res) => {
   try {
     const {name, email, senha, cpf, phone, cep, endereco,
       numero, complemento, bairro, cidade, estado} = req.body;

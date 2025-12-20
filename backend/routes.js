@@ -4,7 +4,8 @@ export default route;
 
 //controllers
 import { index, id_index } from './controllers/testController.js'
-import { register } from './controllers/registerController.js'
+import { registerAccount } from './controllers/registerController.js'
+import { accountExists } from './controllers/loginController.js'
 
 //middlewares
 import { verifyToken } from './middlewares/verifyToken.js';
@@ -17,4 +18,6 @@ route.get('/tshirt', index);
 
 route.post('/tshirt/:id', id_index);
 
-route.post('/login/register/create', blockLoggedIn, register);
+route.post('/login/entry', blockLoggedIn, accountExists);
+
+route.post('/login/register/create', blockLoggedIn, registerAccount);
