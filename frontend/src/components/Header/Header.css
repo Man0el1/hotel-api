@@ -1,5 +1,10 @@
-a {
+a{
   text-decoration: none;
+}
+
+button {
+  all: unset;
+  cursor: pointer;
 }
 
 .header {
@@ -11,8 +16,12 @@ a {
 .navbar {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+  padding-right: 20px;
   text-decoration: none;
   background-color: rgb(236, 218, 178);
+  height: 80px;
 }
 
 .nav-item {

@@ -20,22 +20,30 @@ export default function Header() {
   return(
     <div className="header">
       <ul className="navbar">
+        <>
+          <li className="nav-item">
+            <a className="nav-link" href="/">Home</a>
+          </li>
+          <li className="nav-item">
+            <a className="nav-link" href="/tipo-quartos">Nossos quartos</a>
+          </li>
+          <li className="nav-item">
+            <a className="nav-link" href="/reserva">Reservar</a>
+          </li>
+        </>
         {isAuth ? (
           <>
             <li className="nav-item">
               <a className="nav-link" href="/perfil">Perfil</a>
             </li>
             <li className="nav-item">
-              <button className="nav-link logout" onClick={handleLogout}>
+              <button className="nav-link" onClick={handleLogout}>
                 Sair
               </button>
             </li>
           </>
         ) : (
           <>
-            <li className="nav-item">
-              <a className="nav-link" href="/reserva">Reservar</a>
-            </li>
             <li className="nav-item">
               <a className="nav-link" href="/login">Entrar</a>
             </li>
