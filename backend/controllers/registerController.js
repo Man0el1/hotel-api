@@ -30,7 +30,7 @@ export const registerAccount = async (req, res) => {
     if (emailExists || cpfExists) return res.status(403).json(
       {message: "Conta já está cadastrada! Tente fazer login."});
 
-    const isAdmin = (email === 'manoelgtcj@gmail.com'? true : false);
+    const isAdmin = (lowercaseEmail === 'manoelgtcj@gmail.com'? true : false);
     const senhaHash = await bcrypt.hash(senha, 8);
 
     let enderecoExistente = await Endereco.findOne({

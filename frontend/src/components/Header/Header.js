@@ -1,27 +1,43 @@
 import React from "react";
-
+import { useState, useEffect } from "react";
 import './Header.css'
 
 export default function Header() {
+
+  const [isAuth, setIsAuth] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuth(!!token);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsAuth(false);
+    window.location.href = "/";
+  }
+
   return(
     <div className="header">
       <ul className="navbar">
-        { localStorage.getItem('token') ? (
+        {isAuth ? (
           <>
             <li className="nav-item">
-              <a className="nav-link" href="/reserva">reserva</a>
+              <a className="nav-link" href="/perfil">Perfil</a>
             </li>
             <li className="nav-item">
-              <p className="nav-link" >perfil</p>
+              <button className="nav-link logout" onClick={handleLogout}>
+                Sair
+              </button>
             </li>
           </>
         ) : (
           <>
             <li className="nav-item">
-              <a className="nav-link" href="/login">login</a>
+              <a className="nav-link" href="/reserva">Reservar</a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="/login/register">registrar</a>
+              <a className="nav-link" href="/login">Entrar</a>
             </li>
           </>
         )}

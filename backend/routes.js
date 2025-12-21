@@ -20,4 +20,6 @@ route.post('/tshirt/:id', id_index);
 
 route.post('/login/entry', blockLoggedIn, accountExists);
 
-route.post('/login/register/create', blockLoggedIn, registerAccount);
+route.post('/register/create', blockLoggedIn, registerAccount);
+
+//route.post('/reserva', verifyToken, /*remover token*/);

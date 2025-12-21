@@ -49,7 +49,7 @@ export default function Login() {
         <input className='submit' type='submit' value='Enviar' />
       </form>
 
-      <a className="nav-link" href="/login/register">Sign-in</a>
+      <a className="nav-link" href="/register">Crie uma conta</a>
     </div>
   ) 
 }

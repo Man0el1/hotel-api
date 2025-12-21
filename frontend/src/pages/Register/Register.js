@@ -47,7 +47,7 @@ export default function Register() {
         return;
       }
 
-      let response = await fetch("http://localhost:8080/login/register/create", {
+      let response = await fetch("http://localhost:8080/register/create", {
         method: "POST",
         headers: {'Content-Type': 'application/json'}, // indica que estamos enviando json
         body: JSON.stringify({name, email, senha, cpf, phone, cep, endereco, numero, complemento, bairro, cidade, estado})
