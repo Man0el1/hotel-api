@@ -1,21 +1,20 @@
 import jwt from "jsonwebtoken";
 import { Conta } from "../models/contaModel.js";
+import { Endereco } from "../models/contaEnderecoModel.js";
 
-export async function verifyToken(req, res, next) {
-  const authHeader = req.headers['authorization']; // Bearer <token>
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (!token) return res.status(401).json({ message: "Token não fornecido" });
-
+export const getProfile = async(req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = req.user.id;
+    const conta = await Conta.findByPk(userId, {
+      attributes: { exclude: ['senha'] }
+    });
+    if(!conta) return res.status(404).json({message: "Conta não encontrada."});
 
-    const usuario = await Conta.findByPk(decoded.id);
-    if (!usuario) return res.status(401).json({ message: "Usuário não existe mais" });
+    const endereco = await Endereco.findByPk(conta.id_endereco);
+    if(!endereco) return res.status(404).json({message: "Endereço não encontrado."});
 
-    req.user = decoded;
-    next();
-  } catch (err) {
-    return res.status(403).json({ message: "Token inválido ou expirado" });
+    return res.status(200).json({conta, endereco});
+  } catch (e) {
+    return res.status(500).json({message: "Erro ao buscar perfil."});
   }
 }

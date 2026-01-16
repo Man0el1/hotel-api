@@ -53,7 +53,7 @@ export const registerAccount = async (req, res) => {
     });
 
     const token = jwt.sign(
-      { id: novaConta.id_conta, email: novaConta.email },
+      { id: novaConta.id_conta },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );

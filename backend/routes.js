@@ -23,7 +23,7 @@ route.post('/login/entry', blockLoggedIn, accountExists);
 
 route.post('/register/create', blockLoggedIn, registerAccount);
 
-//route.get('/perfil', getProfile);
+route.get('/perfil', verifyToken, getProfile);
 
 //route.post('/perfil', verifyToken, /*remover token*/);
 //route.post('/reserva', verifyToken, /*remover token*/);

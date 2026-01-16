@@ -55,7 +55,7 @@ export default function Register() {
       let data = await response.json();
 
       if (response.status === 201) {
-        localStorage.setItem("token", data.token); 
+        localStorage.setItem("token", data.token);
         alert(data.message);
         window.location.href = "/";
       } else {

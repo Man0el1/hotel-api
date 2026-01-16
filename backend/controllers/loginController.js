@@ -13,7 +13,7 @@ export const accountExists = async (req, res) => {
     if (!senhaCorreta) return res.status(403).json({message: "senha errada."});
 
     const token = jwt.sign(
-      { id: conta.id_conta, email: conta.email },
+      { id: conta.id_conta },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
