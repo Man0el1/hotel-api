@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+import sequelize from '../database/sequelize.js';
 import { Quarto } from './quartoModel.js';
 import { Reserva } from './reservaModel.js';
 

@@ -1,28 +1,21 @@
 import express from 'express';
-import helmet from "helmet";
-import cors from 'cors';
-import routes from './routes.js'
-import { connectToDatabase } from './config/db.js';
-import dotenv from "dotenv";
-dotenv.config();
+import sequelize from './src/database/sequelize.js';
+import routes from './src/routes.js';
+
 const app = express();
 
-const PORT = 8080;
-
-app.use(cors({origin: "http://localhost:3000"}));
 app.use(express.json());
-app.use(helmet());
 app.use(routes);
 
-const startServer = async () => {
+(async () => {
   try {
-    await connectToDatabase();
-    app.listen(PORT, () => {
-      console.log(`Servidor rodando no http://localhost:${PORT}`)
-    });
-  } catch (e) {
-    console.error("Erro ao iniciar servidor:", e);
-  }
-};
+    await sequelize.authenticate();
+    console.log('Banco de dados conectado com sucesso');
 
-startServer();
+    app.listen(3000, () => {
+      console.log('Servidor rodando na porta 3000');
+    });
+  } catch (error) {
+    console.error('Erro ao conectar no banco:', error);
+  }
+})();

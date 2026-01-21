@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+import sequelize from '../database/sequelize.js';
 
-const tiposDeQuarto = [Solteiro, Casal, Familia, Luxo];
+const tiposDeQuarto = ['SOLTEIRO', 'CASAL', 'FAMILIA', 'LUXO'];
 
 export const Quarto = sequelize.define('Quarto', {
   id_quarto: {
@@ -10,10 +10,12 @@ export const Quarto = sequelize.define('Quarto', {
     autoIncrement: true
   },
   numero: {
-    type: DataTypes.BOOLEAN
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    unique: true
   },
   tipo: {
-    type: DataTypes.ENUM[tiposDeQuarto],
+    type: DataTypes.ENUM(...tiposDeQuarto),
     allowNull: false,
   },
   is_smoker: {

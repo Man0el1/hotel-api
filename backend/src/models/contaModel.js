@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+import sequelize from '../database/sequelize.js';
 import { Endereco } from './contaEnderecoModel.js';
 
 export const Conta = sequelize.define('Conta', {
@@ -20,6 +20,8 @@ export const Conta = sequelize.define('Conta', {
   },
   is_admin: {
     type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   },
   nome: {
     type: DataTypes.STRING,
@@ -29,6 +31,7 @@ export const Conta = sequelize.define('Conta', {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
     validate: { isEmail: true }
   },
   senha: {
@@ -38,6 +41,7 @@ export const Conta = sequelize.define('Conta', {
   cpf: {
     type: DataTypes.STRING(11),
     allowNull: false,
+    unique: true
   },
   telefone: {
     type: DataTypes.STRING,
