@@ -5,6 +5,7 @@ const route = express.Router();
 import { registerAccount } from './controllers/registerController.js'
 import { accountExists } from './controllers/loginController.js'
 import { getProfile } from './controllers/perfilController.js'
+import { getCurrentDate } from './controllers/dataController.js'
 
 //middlewares
 import { verifyToken } from './middlewares/verifyToken.js';
@@ -18,6 +19,8 @@ route.post('/login/entry', blockLoggedIn, accountExists);
 route.post('/register/create', blockLoggedIn, registerAccount);
 
 route.get('/perfil', verifyToken, getProfile);
+
+route.get('/dataAtual', getCurrentDate);
 
 //route.post('/perfil', verifyToken, /*remover token*/);
 //route.post('/reserva', verifyToken, /*remover token*/);
