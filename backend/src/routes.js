@@ -18,11 +18,12 @@ route.post('/login/entry', blockLoggedIn, accountExists);
 
 route.post('/register/create', blockLoggedIn, registerAccount);
 
+route.post('/reserva/disponibilidade', /*verificar disponibilidade*/);
+
 route.get('/perfil', verifyToken, getProfile);
 
 route.get('/dataAtual', getCurrentDate);
 
 //route.post('/perfil', verifyToken, /*remover token*/);
-//route.post('/reserva', verifyToken, /*remover token*/);
 
 export default route;
