@@ -10,13 +10,14 @@ export default function Login() {
   const [dataAnoSeguinte, setDataAnoSeguinte] = useState('');
   const [checkin, setCheckin] = useState('');
   const [checkout, setCheckout] = useState('');
-  const [quantMaxQuartos, setQuantMaxQuartos] = useState(({solteiro: 0, casal: 0, familia: 0, luxo: 0}));
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [quantMaxQuartos, setQuantMaxQuartos] = useState(({SOLTEIRO: 0, CASAL: 0, FAMILIA: 0, LUXO: 0}));
 
   const [tiposDeQuarto, setTiposDeQuarto] = useState([
-    { tipo: 'solteiro', capacidade: 1, preco: 120, contador: 0 },
-    { tipo: 'casal', capacidade: 2, preco: 200, contador: 0 },
-    { tipo: 'familia', capacidade: 4, preco: 350, contador: 0 },
-    { tipo: 'luxo', capacidade: 2, preco: 550, contador: 0 }
+    { tipo: 'SOLTEIRO', capacidade: 1, preco: 120, contador: 0 },
+    { tipo: 'CASAL', capacidade: 2, preco: 200, contador: 0 },
+    { tipo: 'FAMILIA', capacidade: 4, preco: 350, contador: 0 },
+    { tipo: 'LUXO', capacidade: 2, preco: 550, contador: 0 }
   ]);
 
   useEffect(() => {
@@ -34,12 +35,20 @@ export default function Login() {
     if (dataCheckout <= amanha) {
       setCheckout(amanha.toISOString().split('T')[0]);
     }
-    setTotalDias(dataCheckout - new Date(checkin) / (1000 * 60 * 60 * 24));
+    setTotalDias((dataCheckout - new Date(checkin)) / (1000 * 60 * 60 * 24));
   }, [checkin, checkout]);
 
-  //useEffect(() => {
-  //  calcularPrecoTotal();
-  //}, [tiposDeQuarto, totalDias]);
+  useEffect(() => {
+    calcularPrecoTotal();
+  }, [tiposDeQuarto]);
+
+  const calcularPrecoTotal = () => {
+    let soma = 0;
+    tiposDeQuarto.forEach(quarto => {
+      soma += quarto.preco * quarto.contador;
+    });
+    setPrecoTotal(soma * totalDias);
+  }
 
   const getCurrentDate = async () => {
     try {
@@ -48,7 +57,7 @@ export default function Login() {
         headers: {
           "Content-Type": "application/json",
         }
-      });
+      });;
       let data = await response.json();
       if (response.status === 200) {
         setDataAtual(data.dataAtual);
@@ -61,8 +70,6 @@ export default function Login() {
       setDataAtual(new Date().toISOString().split('T')[0]);
     };
   }
-
-  //const calcularPrecoTotal = () => {
 
   const alterarContador = (tipo, valor) => {
     setTiposDeQuarto(prev =>
@@ -86,39 +93,43 @@ export default function Login() {
           <p>Capacidade: {quarto.capacidade} pessoa(s)</p>
           <p>Preço por noite: R$ {quarto.preco}</p>
           <div className="contador-quartos">
-            <button onClick={() => {alterarContador(quarto.tipo, -1)}} disabled>-</button>
+            <button onClick={() => {alterarContador(quarto.tipo, -1)}} disabled={isDisabled}>-</button>
             <span className="numero-quartos">{quarto.contador}</span>
-            <button onClick={() => {alterarContador(quarto.tipo, 1)}} disabled>+</button>
+            <button onClick={() => {alterarContador(quarto.tipo, 1)}} disabled={isDisabled}>+</button>
           </div>
         </div>
       ))
     );
   };
-  /*const handleSubmitDays = async (e) => {
+
+  const handleSubmitDays = async (e) => {
     e.preventDefault();
     try {
       let response = await fetch("http://localhost:8080/reserva/disponibilidade", {
         method: "POST",
-        headers: {'Content-Type': 'application/json'}, // indica que estamos enviando json
-        body: JSON.stringify({email, senha})
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({checkin, checkout})
       });
       let data = await response.json();
       if (response.status === 200) {
-        localStorage.setItem("token", data.token); 
-        alert(data.message);
-        window.location.href = "/";
+        setQuantMaxQuartos(data.disponibilidade)
+        setIsDisabled(false);
+        tiposDeQuarto.forEach(quarto => {
+          quarto.contador = 0;
+        });
+        setPrecoTotal(0);
       } else {
         alert(data.message);
       }
     } catch (e) {
       console.log("erro no fetch");
     }
-  }*/
+  }
 
   return(
     <div className="reserva-page">
       <div className="form-reserva">
-        <form className='form-search' /*onSubmit={handleSubmitDays}*/>
+        <form className='form-search' onSubmit={handleSubmitDays}>
           
           <label htmlFor="checkin">Check-in</label>
           <input value={checkin} onChange={(e) => setCheckin(e.target.value)} min={dataAtual} max={dataAnoSeguinte} id='checkin' name='checkin' className='input' type='date' />

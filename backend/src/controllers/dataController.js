@@ -1,6 +1,6 @@
 export const getCurrentDate = async (req, res) => {
   try {
-    const currentDate = new Date()
+    const currentDate = new Date();
     const oneYearLater = new Date();
     oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
 

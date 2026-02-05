@@ -1,4 +1,3 @@
-import jwt from "jsonwebtoken";
 import { Conta } from "../models/contaModel.js";
 import { Endereco } from "../models/contaEnderecoModel.js";
 
