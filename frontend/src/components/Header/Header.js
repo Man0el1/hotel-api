@@ -25,9 +25,6 @@ export default function Header() {
             <a className="nav-link" href="/">Home</a>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="/tipo-quartos">Nossos quartos</a>
-          </li>
-          <li className="nav-item">
             <a className="nav-link" href="/reserva">Reservar</a>
           </li>
         </>

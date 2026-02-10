@@ -3,3 +3,11 @@
   background-color: #0a192f;
   color: #ccd6f6;
 }
+
+.posneg{
+  color: #ffffff;
+  border: 2px solid black;
+  padding: 0px 10px;
+  margin: 0px 5px;
+  cursor: pointer;
+}

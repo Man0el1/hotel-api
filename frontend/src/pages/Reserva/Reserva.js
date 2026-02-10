@@ -1,7 +1,8 @@
 import React, { useState, useEffect} from "react";
 import './Reserva.css'
+import QuartoModal from "../../components/Modal/Modal";
 
-export default function Login() {
+export default function Reserva() {
 
   const [dataAtual, setDataAtual] = useState('');
   const [totalDias, setTotalDias] = useState(0);
@@ -10,14 +11,19 @@ export default function Login() {
   const [dataAnoSeguinte, setDataAnoSeguinte] = useState('');
   const [checkin, setCheckin] = useState('');
   const [checkout, setCheckout] = useState('');
-  const [isDisabled, setIsDisabled] = useState(true);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true); 
+  const [showModal, setShowModal] = useState(false);
+  const [modalQuartoSelecionado, setModalQuartoSelecionado] = useState(null);
+  const [modalTipoSelecionado, setModalTipoSelecionado] = useState(null);
   const [quantMaxQuartos, setQuantMaxQuartos] = useState(({SOLTEIRO: 0, CASAL: 0, FAMILIA: 0, LUXO: 0}));
+  const [quantMaxQuartosFumante, setQuantMaxQuartosFumante] = useState(({SOLTEIRO: 0, CASAL: 0, FAMILIA: 0, LUXO: 0}));
+  const [quantMaxQuartosFrente, setQuantMaxQuartosFrente] = useState(({SOLTEIRO: 0, CASAL: 0, FAMILIA: 0, LUXO: 0}));
 
   const [tiposDeQuarto, setTiposDeQuarto] = useState([
-    { tipo: 'SOLTEIRO', capacidade: 1, preco: 120, contador: 0 },
-    { tipo: 'CASAL', capacidade: 2, preco: 200, contador: 0 },
-    { tipo: 'FAMILIA', capacidade: 4, preco: 350, contador: 0 },
-    { tipo: 'LUXO', capacidade: 2, preco: 550, contador: 0 }
+    { tipo: 'SOLTEIRO', capacidade: 1, preco: 120, contador: 0, contadorFumante: 0, contadorFrente: 0 },
+    { tipo: 'CASAL', capacidade: 2, preco: 200, contador: 0, contadorFumante: 0, contadorFrente: 0 },
+    { tipo: 'FAMILIA', capacidade: 4, preco: 350, contador: 0, contadorFumante: 0, contadorFrente: 0 },
+    { tipo: 'LUXO', capacidade: 2, preco: 550, contador: 0, contadorFumante: 0, contadorFrente: 0 }
   ]);
 
   useEffect(() => {
@@ -45,7 +51,7 @@ export default function Login() {
   const calcularPrecoTotal = () => {
     let soma = 0;
     tiposDeQuarto.forEach(quarto => {
-      soma += quarto.preco * quarto.contador;
+      soma += quarto.preco * quarto.contador + quarto.contadorFrente * (0.1 * quarto.preco)
     });
     setPrecoTotal(soma * totalDias);
   }
@@ -71,15 +77,52 @@ export default function Login() {
     };
   }
 
-  const alterarContador = (tipo, valor) => {
+  const alterarContador = (tipo, valor, tipoContador) => {
     setTiposDeQuarto(prev =>
       prev.map(quarto => {
-        if (quarto.tipo === tipo) {
+        if (quarto.tipo !== tipo) return quarto;
+
+        if (tipoContador === 'normal') {
           const novoValor = quarto.contador + valor;
-          if (novoValor <= quantMaxQuartos[tipo] && novoValor >= 0) {
-            return {...quarto, contador: novoValor}
+          if (novoValor > quantMaxQuartos[tipo] || novoValor < 0) return quarto;
+
+          let fumante = quarto.contadorFumante;
+          let frente = quarto.contadorFrente;
+          while (fumante + frente > novoValor) {
+            if (frente > 0) frente--;
+            else fumante--;
+          }
+
+          return {
+            ...quarto,
+            contador: novoValor,
+            contadorFumante: fumante,
+            contadorFrente: frente
+          };
+        }
+
+        if (tipoContador === 'fumante') {
+          const novoValor = quarto.contadorFumante + valor;
+          const maxExtras = novoValor + quarto.contadorFrente;
+          if (novoValor > quantMaxQuartosFumante[tipo] || novoValor < 0 || novoValor + quarto.contadorFrente > quarto.contador) return quarto;
+
+          return {
+            ...quarto,
+            contadorFumante: Math.min(maxExtras, novoValor)
           }
         }
+
+        if (tipoContador === 'frente') {
+          const novoValor = quarto.contadorFrente + valor;
+          const maxExtras = quarto.contadorFumante + novoValor;
+          if (novoValor > quantMaxQuartosFrente[tipo] || novoValor < 0 || novoValor + quarto.contadorFumante > quarto.contador) return quarto;
+
+          return {
+            ...quarto, 
+            contadorFrente: Math.min(maxExtras, novoValor)
+          }
+        }
+
         return quarto;
       })
     );
@@ -93,10 +136,11 @@ export default function Login() {
           <p>Capacidade: {quarto.capacidade} pessoa(s)</p>
           <p>Preço por noite: R$ {quarto.preco}</p>
           <div className="contador-quartos">
-            <button onClick={() => {alterarContador(quarto.tipo, -1)}} disabled={isDisabled}>-</button>
+            <button onClick={() => {alterarContador(quarto.tipo, -1, 'normal')}} className="posneg" disabled={isButtonDisabled}>-</button>
             <span className="numero-quartos">{quarto.contador}</span>
-            <button onClick={() => {alterarContador(quarto.tipo, 1)}} disabled={isDisabled}>+</button>
+            <button onClick={() => {alterarContador(quarto.tipo, 1, 'normal')}} className="posneg" disabled={isButtonDisabled}>+</button>
           </div>
+          <button onClick={() => {setModalTipoSelecionado(quarto.tipo); setShowModal(true)}} disabled={isButtonDisabled}>opções extras</button>
         </div>
       ))
     );
@@ -113,11 +157,15 @@ export default function Login() {
       let data = await response.json();
       if (response.status === 200) {
         setQuantMaxQuartos(data.disponibilidade)
-        setIsDisabled(false);
+        setQuantMaxQuartosFumante(data.disponibilidadeFumante)
+        setQuantMaxQuartosFrente(data.disponibilidadeFrente)
+        setIsButtonDisabled(false);
+        setPrecoTotal(0);
+
         tiposDeQuarto.forEach(quarto => {
           quarto.contador = 0;
         });
-        setPrecoTotal(0);
+
       } else {
         alert(data.message);
       }
@@ -125,6 +173,10 @@ export default function Login() {
       console.log("erro no fetch");
     }
   }
+
+  const quartoSelecionado = tiposDeQuarto.find(
+    q => q.tipo === modalTipoSelecionado
+  ); // para passar o quarto selecionado para o modal 
 
   return(
     <div className="reserva-page">
@@ -147,6 +199,21 @@ export default function Login() {
         </div>
         <span> precoTotal: {precoTotal} </span>
       </div>
+
+      <button onClick={() => {submitBooking()}}>Enviar</button>
+
+      <QuartoModal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        tipo={modalTipoSelecionado}
+        quarto={quartoSelecionado}
+        setQuantMaxQuartosFumante={setQuantMaxQuartosFumante}
+        setQuantMaxQuartosFrente={setQuantMaxQuartosFrente}
+        quantMaxQuartosFumante={quantMaxQuartosFumante}
+        quantMaxQuartosFrente={quantMaxQuartosFrente}
+        setTiposDeQuarto={setTiposDeQuarto}
+        alterarContador={alterarContador}
+      />
     </div>
   ) 
 }
