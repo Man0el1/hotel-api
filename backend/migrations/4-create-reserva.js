@@ -22,6 +22,11 @@ export async function up(queryInterface, Sequelize) {
     check_out: {
       type: Sequelize.DATE,
       allowNull: false
+    },
+    status: {
+      type: Sequelize.ENUM("pendente", "confirmada", "concluida", "cancelada"),
+      allowNull: false,
+      defaultValue: "pendente"
     }
   });
 

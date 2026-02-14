@@ -32,6 +32,10 @@ export const Reserva = sequelize.define('Reserva', {
         }
       }
     }
+  },
+  status: {
+    type: DataTypes.ENUM("pendente", "confirmada", "concluida", "cancelada"),
+    defaultValue: "pendente"
   }
 },{
   tableName: "reserva",

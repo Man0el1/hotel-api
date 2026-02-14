@@ -6,6 +6,7 @@ import { registerAccount } from './controllers/registerController.js'
 import { accountExists } from './controllers/loginController.js'
 import { getProfile } from './controllers/perfilController.js'
 import { getAvalibility } from './controllers/reservaController.js'
+import { createPreConfirmation } from './controllers/reservaController.js'
 import { getCurrentDate } from './controllers/dataController.js'
 
 //middlewares
@@ -20,6 +21,8 @@ route.post('/login/entry', blockLoggedIn, accountExists);
 route.post('/register/create', blockLoggedIn, registerAccount);
 
 route.post('/reserva/disponibilidade', getAvalibility);
+
+route.post('/reserva/pre-confirmacao', verifyToken, createPreConfirmation);
 
 route.get('/perfil', verifyToken, getProfile);
 

@@ -13,7 +13,6 @@ export default function Reserva() {
   const [checkout, setCheckout] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(true); 
   const [showModal, setShowModal] = useState(false);
-  const [modalQuartoSelecionado, setModalQuartoSelecionado] = useState(null);
   const [modalTipoSelecionado, setModalTipoSelecionado] = useState(null);
   const [quantMaxQuartos, setQuantMaxQuartos] = useState(({SOLTEIRO: 0, CASAL: 0, FAMILIA: 0, LUXO: 0}));
   const [quantMaxQuartosFumante, setQuantMaxQuartosFumante] = useState(({SOLTEIRO: 0, CASAL: 0, FAMILIA: 0, LUXO: 0}));
@@ -25,6 +24,10 @@ export default function Reserva() {
     { tipo: 'FAMILIA', capacidade: 4, preco: 350, contador: 0, contadorFumante: 0, contadorFrente: 0 },
     { tipo: 'LUXO', capacidade: 2, preco: 550, contador: 0, contadorFumante: 0, contadorFrente: 0 }
   ]);
+
+  const quartoSelecionado = tiposDeQuarto.find(
+    quart => quart.tipo === modalTipoSelecionado
+  ); // para passar o quarto selecionado para o modal 
 
   useEffect(() => {
     getCurrentDate();
@@ -174,9 +177,24 @@ export default function Reserva() {
     }
   }
 
-  const quartoSelecionado = tiposDeQuarto.find(
-    q => q.tipo === modalTipoSelecionado
-  ); // para passar o quarto selecionado para o modal 
+  const submitPreConfirmation = async (e) => {
+    e.preventDefault();
+    try {
+      let response = await fetch("http://localhost:8080/reserva/pre-confirmacao", {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({checkin, checkout, tiposDeQuarto})
+      });
+      let data = await response.json();
+      if (response.status === 200) {
+        // XD
+      } else {
+        alert(data.message);
+      }
+    } catch (e) {
+      console.log("erro no fetch");
+    }
+  }
 
   return(
     <div className="reserva-page">
@@ -200,18 +218,14 @@ export default function Reserva() {
         <span> precoTotal: {precoTotal} </span>
       </div>
 
-      <button onClick={() => {submitBooking()}}>Enviar</button>
+      <button onClick={() => {submitPreConfirmation()}}>Enviar</button>
 
       <QuartoModal
         show={showModal}
         onHide={() => setShowModal(false)}
-        tipo={modalTipoSelecionado}
         quarto={quartoSelecionado}
-        setQuantMaxQuartosFumante={setQuantMaxQuartosFumante}
-        setQuantMaxQuartosFrente={setQuantMaxQuartosFrente}
         quantMaxQuartosFumante={quantMaxQuartosFumante}
         quantMaxQuartosFrente={quantMaxQuartosFrente}
-        setTiposDeQuarto={setTiposDeQuarto}
         alterarContador={alterarContador}
       />
     </div>
