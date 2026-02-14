@@ -159,6 +159,7 @@ export default function Reserva() {
       });
       let data = await response.json();
       if (response.status === 200) {
+        console.log(data);
         setQuantMaxQuartos(data.disponibilidade)
         setQuantMaxQuartosFumante(data.disponibilidadeFumante)
         setQuantMaxQuartosFrente(data.disponibilidadeFrente)
@@ -187,7 +188,9 @@ export default function Reserva() {
       });
       let data = await response.json();
       if (response.status === 200) {
-        // XD
+        alert("reserva pré-confirmada com sucesso: " + data.idReserva, " id da reserva: " + data.idReserva);
+        //ir para confirmar-reserva/:idReserva
+        //window.location.href = "http://localhost:3000/confirmar-reserva/" + data.idReserva;
       } else {
         alert(data.message);
       }

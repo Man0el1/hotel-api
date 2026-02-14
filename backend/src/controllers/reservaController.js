@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import { Quarto } from "../models/quartoModel.js";
 import { Reserva } from "../models/reservaModel.js";
 import { ReservaQuarto } from '../models/reservaQuartoModel.js';
+import sequelize from "../database/sequelize.js";
 
 const getAvailableRooms = async (checkin, checkout, t) => {
   try {
@@ -22,23 +23,24 @@ const getAvailableRooms = async (checkin, checkout, t) => {
         model: Quarto,
         attributes: ['id_quarto', 'tipo'],
         through: { attributes: [] } // relacionamentos (n:n), não trazer atributos da tabela intermediária
-      }
+      },
+      transaction: t
     });
 
-    const IdQuartosReservados = new Set();
+    const idQuartosReservados = new Set();
 
     reservasOcupadas.forEach(reserva => {
       reserva.Quartos.forEach(quarto => {
-        IdQuartosReservados.add(quarto.id_quarto);
+        idQuartosReservados.add(quarto.id_quarto);
       });
     });
 
     const quartosDisponiveis = await Quarto.findAll({
       where: {
-        id_quarto: {[Op.notIn]: [...IdQuartosReservados]}
+        id_quarto: { [Op.notIn]: [...idQuartosReservados] }
       },
       transaction: t,
-      lock: true
+      lock: t.LOCK.UPDATE
     })
 
     quartosDisponiveis.forEach(quarto => {
@@ -59,14 +61,15 @@ const getAvailableRooms = async (checkin, checkout, t) => {
 };
 
 export const getAvalibility = async (req, res) => {
+  const t = await sequelize.transaction();
   try {
-    const t = await sequelize.transaction();
-
     const {checkin, checkout} = req.body;
-    const [disponibilidade, disponibilidadeFumante, disponibilidadeFrente] = await getAvailableRooms(checkin, checkout, t);
+    const [disponibilidade, disponibilidadeFumante, disponibilidadeFrente, quartosDisponiveis] = await getAvailableRooms(checkin, checkout, t);
 
-    return res.status(200).json({ disponibilidade, disponibilidadeFumante, disponibilidadeFrente});
+    await t.commit();
+    return res.status(200).json({ disponibilidade, disponibilidadeFumante, disponibilidadeFrente, quartosDisponiveis});
   } catch (e) {
+    await t.rollback();
     return res.status(500).json({ message: "Erro ao obter disponibilidade: " + e.message });
   }
 }
@@ -162,7 +165,7 @@ export const createPreConfirmation = async (req, res) => {
       await reserva.addQuartos([...quartosSelecionados], { transaction: t });
 
       await t.commit();
-      return res.status(200).json({ reservaId: reserva.id_reserva, valorTotal });
+      return res.status(200).json({ idReserva: reserva.id_reserva, valorTotal, tiposDeQuarto });
     } catch (e) {
       await t.rollback();
       return res.status(500).json({ message: "Erro ao criar pré-confirmação: " + e.message });

@@ -9,7 +9,7 @@ export async function up(queryInterface, Sequelize) {
       type: Sequelize.INTEGER,
       allowNull: false,
       references: {
-        model: 'endereco',
+        model: 'conta_endereco',
         key: 'id_endereco'
       },
       onUpdate: 'CASCADE',
