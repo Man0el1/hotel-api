@@ -8,12 +8,11 @@ export async function verifyToken(req, res, next) {
   if (!token) return res.status(401).json({ message: "Token não fornecido" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-    const usuario = await Conta.findByPk(decoded.id);
+    const usuario = await Conta.findByPk(decodedToken.id);
     if (!usuario) return res.status(401).json({ message: "Usuário não existe mais" });
-
-    req.user = decoded;
+    req.user = decodedToken;
     next();
   } catch (err) {
     return res.status(403).json({ message: "Token inválido ou expirado" });

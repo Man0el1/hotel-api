@@ -156,7 +156,7 @@ export const createPreConfirmation = async (req, res) => {
 
     try {
       const reserva = await Reserva.create({
-        id_conta: req.userId,
+        id_conta: req.user.id,
         check_in: checkin,
         check_out: checkout,
         status: "pendente"
@@ -168,10 +168,10 @@ export const createPreConfirmation = async (req, res) => {
       return res.status(200).json({ idReserva: reserva.id_reserva, valorTotal, tiposDeQuarto });
     } catch (e) {
       await t.rollback();
-      return res.status(500).json({ message: "Erro ao criar pré-confirmação: " + e.message });
+      return res.status(500).json({ message: "Erro ao criar pré-confirmação 1: " + e.message });
     }
 
   } catch (e) {
-    return res.status(500).json({ message: "Erro ao criar pré-confirmação: " + e.message });
+    return res.status(500).json({ message: "Erro ao criar pré-confirmação 2: " + e.message });
   }
 }

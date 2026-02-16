@@ -10,6 +10,7 @@ import Register from "./pages/Register/Register.js";
 import NotFound from "./pages/NotFound/NotFound.js";
 import Perfil from "./pages/Perfil/Perfil.js";
 import Reserva from "./pages/Reserva/Reserva.js";
+import ConfirmarReserva from "./pages/ConfirmarReserva/ConfirmarReserva.js";
 
 export default function App() {
   return (
@@ -20,8 +21,9 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/perfil" element={<Perfil />} />
-        <Route path="*" element={<NotFound />} />
         <Route path="/reserva" element={<Reserva />} />
+        <Route path="/confirmarReserva:idReserva" element={<ConfirmarReserva />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

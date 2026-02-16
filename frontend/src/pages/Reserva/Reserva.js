@@ -48,23 +48,19 @@ export default function Reserva() {
   }, [checkin, checkout]);
 
   useEffect(() => {
-    calcularPrecoTotal();
-  }, [tiposDeQuarto]);
-
-  const calcularPrecoTotal = () => {
     let soma = 0;
     tiposDeQuarto.forEach(quarto => {
-      soma += quarto.preco * quarto.contador + quarto.contadorFrente * (0.1 * quarto.preco)
+      soma += quarto.preco * quarto.contador + quarto.contadorFrente * (0.1 * quarto.preco);
     });
     setPrecoTotal(soma * totalDias);
-  }
+  }, [tiposDeQuarto, totalDias]);
 
   const getCurrentDate = async () => {
     try {
       let response = await fetch("http://localhost:8080/dataAtual", {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         }
       });;
       let data = await response.json();
@@ -179,18 +175,19 @@ export default function Reserva() {
   }
 
   const submitPreConfirmation = async (e) => {
-    e.preventDefault();
     try {
       let response = await fetch("http://localhost:8080/reserva/pre-confirmacao", {
         method: "POST",
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
         body: JSON.stringify({checkin, checkout, tiposDeQuarto})
       });
       let data = await response.json();
       if (response.status === 200) {
-        alert("reserva pré-confirmada com sucesso: " + data.idReserva, " id da reserva: " + data.idReserva);
-        //ir para confirmar-reserva/:idReserva
-        //window.location.href = "http://localhost:3000/confirmar-reserva/" + data.idReserva;
+        alert("reserva pré-confirmada com sucesso! id da reserva: " + data.idReserva);
+        window.location.href = "http://localhost:3000/confirmar-reserva/" + data.idReserva;
       } else {
         alert(data.message);
       }
