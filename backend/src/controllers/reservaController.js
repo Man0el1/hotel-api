@@ -75,9 +75,8 @@ export const getAvalibility = async (req, res) => {
 }
 
 export const createPreConfirmation = async (req, res) => {
+  const t = await sequelize.transaction();
   try {
-    const t = await sequelize.transaction();
-
     const { checkin, checkout, tiposDeQuarto } = req.body;
     let quartosSelecionados = new Set();
     let valorTotal = 0;
@@ -113,7 +112,7 @@ export const createPreConfirmation = async (req, res) => {
           const quartoFumante = quartosDisponiveis.find(
             q => idsDisponiveis.includes(q.id_quarto) && q.tipo === quarto.tipo && q.is_smoker
           );
-          if (!quartoFumante) throw new Error("Sem quartos suficientes");
+          if (!quartoFumante) throw new Error("Sem quartos suficientes 1");
           quartosSelecionados.add(quartoFumante.id_quarto);
           idsDisponiveis = idsDisponiveis.filter( id => id !== quartoFumante.id_quarto );
 
@@ -125,7 +124,7 @@ export const createPreConfirmation = async (req, res) => {
           const quartoFrente = quartosDisponiveis.find(
             q => idsDisponiveis.includes(q.id_quarto) && q.tipo === quarto.tipo && q.is_front_view
           );
-          if (!quartoFrente) throw new Error("Sem quartos suficientes");
+          if (!quartoFrente) throw new Error("Sem quartos suficientes 2");
           quartosSelecionados.add(quartoFrente.id_quarto);
           idsDisponiveis = idsDisponiveis.filter( id => id !== quartoFrente.id_quarto );
 
@@ -146,7 +145,7 @@ export const createPreConfirmation = async (req, res) => {
           && (!q.is_front_view || temQuartoSemVista)
         );
 
-        if (!quartoNormal) throw new Error("Sem quartos suficientes");
+        if (!quartoNormal) throw new Error("Sem quartos suficientes 3");
         quartosSelecionados.add(quartoNormal.id_quarto);
         idsDisponiveis = idsDisponiveis.filter( id => id !== quartoNormal.id_quarto );
 
@@ -159,19 +158,21 @@ export const createPreConfirmation = async (req, res) => {
         id_conta: req.user.id,
         check_in: checkin,
         check_out: checkout,
+        valor_total: valorTotal,
         status: "pendente"
       }, { transaction: t });
 
       await reserva.addQuartos([...quartosSelecionados], { transaction: t });
 
       await t.commit();
-      return res.status(200).json({ idReserva: reserva.id_reserva, valorTotal, tiposDeQuarto });
+      return res.status(200).json({ idReserva: reserva.id_reserva, tiposDeQuarto });
     } catch (e) {
       await t.rollback();
       return res.status(500).json({ message: "Erro ao criar pré-confirmação 1: " + e.message });
     }
 
   } catch (e) {
+    await t.rollback();
     return res.status(500).json({ message: "Erro ao criar pré-confirmação 2: " + e.message });
   }
 }

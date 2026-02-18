@@ -22,7 +22,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/reserva" element={<Reserva />} />
-        <Route path="/confirmarReserva:idReserva" element={<ConfirmarReserva />} />
+        <Route path="/confirmar-reserva/:idReserva" element={<ConfirmarReserva />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
