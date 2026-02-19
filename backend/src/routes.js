@@ -4,7 +4,7 @@ const route = express.Router();
 //controllers
 import { registerAccount } from './controllers/registerController.js'
 import { accountExists } from './controllers/loginController.js'
-import { getProfile } from './controllers/perfilController.js'
+import { getProfileInfo } from './controllers/perfilController.js'
 import { getAvalibility } from './controllers/reservaController.js'
 import { createPreConfirmation } from './controllers/reservaController.js'
 import { getCurrentDate } from './controllers/dataController.js'
@@ -26,7 +26,7 @@ route.post('/reserva/disponibilidade', getAvalibility);
 
 route.post('/reserva/pre-confirmacao', verifyToken, createPreConfirmation);
 
-route.get('/perfil', verifyToken, getProfile);
+route.get('/perfil', verifyToken, getProfileInfo);
 
 route.get('/dataAtual', getCurrentDate);
 

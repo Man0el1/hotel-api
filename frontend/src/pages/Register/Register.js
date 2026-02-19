@@ -28,9 +28,11 @@ export default function Register() {
   }, []);
 
   const displayOptions = () => {
-    return estados.map((uf, index) => (
-      <option key={uf} value={uf}>{uf}</option>
-    ));
+    return (
+      estados.map((uf, index) => (
+        <option key={uf} value={uf}>{uf}</option>
+      ))
+    );
   }
 
   const handleCepChange = (e) => { setCep(e.target.value.replace(/\D/g, "")); }

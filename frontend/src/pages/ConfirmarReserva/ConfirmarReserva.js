@@ -66,12 +66,11 @@ export default function ConfirmarReserva() {
   const handleSubmit = async (e) => {
     try {
       let response = await fetch("http://localhost:8080/confirmar-reserva/" + params.idReserva, + "/submit", {
-        method: "post",
+        method: "GET",
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-        body:
+        }
       });
       let data = await response.json();
       if (response.status === 200) {

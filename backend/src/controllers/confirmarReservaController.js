@@ -3,9 +3,8 @@ import { Quarto } from "../models/quartoModel.js";
 import { Reserva } from "../models/reservaModel.js";
 import { ReservaQuarto } from '../models/reservaQuartoModel.js';
 import sequelize from "../database/sequelize.js";
-//    t = await sequelize.transaction();
 
-const validateUserReserva = async (idUsuario, idReserva) => {
+const validateUserReserva = async (idUsuario, idReserva, t) => {
   const reserva = await Reserva.findOne({
     where: {
       id_reserva: idReserva,
@@ -14,7 +13,8 @@ const validateUserReserva = async (idUsuario, idReserva) => {
       model: Quarto,
       attributes: ['id_quarto', 'tipo', 'is_smoker', 'is_front_view'],
       through: { attributes: [] }
-    }
+    },
+    transaction: t
   })
   if (!reserva) throw new Error("Reserva não encontrada");
   if (reserva.id_conta !== idUsuario || reserva.status !== "pendente") throw new Error("Acesso negado à reserva");
@@ -22,14 +22,33 @@ const validateUserReserva = async (idUsuario, idReserva) => {
 }
 
 export const getReservaInfo = async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const idToken = req.user.id;
+    const idReserva = req.params.idReserva;
+    if (!idReserva) return res.status(400).json({ message: "ID da reserva é obrigatório" });
+
+    const reserva = await validateUserReserva(idToken, idReserva, t);
+    return res.status(200).json({ reserva });
+  } catch (e) {
+    return res.status(500).json({ message: "Erro: " + e.message });
+  }
+}
+
+export const submitReserva = async (req, res) => {
+  const t = await sequelize.transaction();
   try {
     const idToken = req.user.id;
     const idReserva = req.params.idReserva;
     if (!idReserva) return res.status(400).json({ message: "ID da reserva é obrigatório" });
 
     const reserva = await validateUserReserva(idToken, idReserva);
-    return res.status(200).json({ reserva });
+    await reserva.update({ status: "confirmada" }, { transaction: t });
+
+    await t.commit();
+    return res.status(200).json({ message: "Reserva concluida!" });
   } catch (e) {
+    await t.rollback();
     return res.status(500).json({ message: "Erro: " + e.message });
   }
 }
