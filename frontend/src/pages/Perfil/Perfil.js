@@ -17,6 +17,25 @@ export default function Perfil() {
     getUserInfo();
   }, []);
 
+  const handleCancelation = async (idReserva) => {
+    try {
+      let response = await fetch("http://localhost:8080/cancelar-reserva/", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify({idReserva})
+      })
+      let data = await response.json();
+      if (response.status === 200) {
+        //
+      }
+    } catch(e) {
+      alert("erro no fetch: " + e);
+    }
+  }
+
   const getUserInfo = async () => {
     try {
       let response = await fetch("http://localhost:8080/perfil", {
@@ -44,7 +63,8 @@ export default function Perfil() {
         <p><strong>Email:</strong> {user.email}</p>
         <p><strong>CPF:</strong> {user.cpf}</p>
         <p><strong>Telefone:</strong> {user.telefone}</p>
-        <p><strong>Endereço:</strong> {endereco.endereco}, {endereco.numero} {endereco.complemento && `- ${endereco.complemento}`}</p>
+        <p><strong>Endereço:</strong> {endereco.endereco}, {endereco.numero} 
+        {endereco.complemento && `- ${endereco.complemento}`}</p>
         <p><strong>Bairro:</strong> {endereco.bairro}</p>
         <p><strong>Cidade:</strong> {endereco.cidade}</p>
         <p><strong>Estado:</strong> {endereco.estado}</p>
@@ -54,15 +74,22 @@ export default function Perfil() {
   }
 
   const showUserBookings = () => {
-    
     return(
       reservas.map(reserva => (
         <div key={reserva.id_reserva} className="bookingCard">
-          <p><strong>ID da reserva:</strong> {reserva.id_reserva}</p>
-          <p><strong>Data de entrada:</strong> {new Date(reserva.data_entrada).toLocaleDateString()}</p>
-          <p><strong>Data de saída:</strong> {new Date(reserva.data_saida).toLocaleDateString()}</p>
+          <p><strong>Data de entrada:</strong> {new Date(reserva.check_in).toLocaleDateString('pt-BR')}</p>
+          <p><strong>Data de saída:</strong> {new Date(reserva.check_out).toLocaleDateString('pt-BR')}</p>
           <p><strong>Valor total:</strong> R$ {reserva.valor_total}</p>
           <p><strong>Status:</strong> {reserva.status}</p>
+
+          {reserva.status === "pendente" && <a 
+            className="p-3 mb-2 bg-success text-white" 
+            href={"http://localhost:3000/confirmar-reserva/" + reserva.id_reserva}>Confirmar reserva
+          </a>}
+          {reserva.status === "confirmada" && <button 
+            className="p-3 mb-2 bg-danger text-white" 
+            onClick={handleCancelation(reserva.id_reserva)}>Cancelar reserva
+          </button>}
         </div>
       ))
     );

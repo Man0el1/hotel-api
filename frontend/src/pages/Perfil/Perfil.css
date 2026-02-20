@@ -1,0 +1,15 @@
+.bookingCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  max-width: 500px;   /* limite de largura */
+  margin: 40px auto;  /* centraliza horizontalmente */
+
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #474c5a;
+  
+}

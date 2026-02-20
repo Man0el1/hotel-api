@@ -8,7 +8,8 @@ import { getProfileInfo } from './controllers/perfilController.js'
 import { getAvalibility } from './controllers/reservaController.js'
 import { createPreConfirmation } from './controllers/reservaController.js'
 import { getCurrentDate } from './controllers/dataController.js'
-import { getReservaInfo } from './controllers/confirmarReservaController.js'
+import { getReservaInfo, submitReserva } from './controllers/confirmarReservaController.js'
+import { xxx } from './controllers/cancelarReservaController.js'
 
 //middlewares
 import { verifyToken } from './middlewares/verifyToken.js';
@@ -28,11 +29,13 @@ route.post('/reserva/pre-confirmacao', verifyToken, createPreConfirmation);
 
 route.get('/perfil', verifyToken, getProfileInfo);
 
+route.post('/cancelar-reserva', verifyToken, xxx)
+
 route.get('/dataAtual', getCurrentDate);
 
 route.get('/confirmar-reserva/:idReserva', verifyToken, getReservaInfo);
 
-route.post('/confirmar-reserva/:idReserva/submit', verifyToken, );
+route.get('/confirmar-reserva/:idReserva/submit', verifyToken, submitReserva);
 
 //route.post('/perfil', verifyToken, /*remover token*/);
 

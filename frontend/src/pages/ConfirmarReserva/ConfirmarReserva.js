@@ -33,7 +33,7 @@ export default function ConfirmarReserva() {
     return (
       tiposDeQuarto.map((tipo, index) => (
         <div key={index}>
-          {tipo.total > 0} && <h3>x quarto de {tipo.tipo}</h3>
+          {tipo.total > 0 && <h3>{tipo.total}x quarto de {tipo.tipo}</h3>}
           {tipo.fumante > 0 && <p>{tipo.fumante}x fumante</p>}
           {tipo.frente > 0 && <p>{tipo.frente}x frente</p>}
         </div>
@@ -65,7 +65,7 @@ export default function ConfirmarReserva() {
 
   const handleSubmit = async (e) => {
     try {
-      let response = await fetch("http://localhost:8080/confirmar-reserva/" + params.idReserva, + "/submit", {
+      let response = await fetch("http://localhost:8080/confirmar-reserva/" + params.idReserva + "/submit", {
         method: "GET",
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export default function ConfirmarReserva() {
         alert(data.message);
       }
     } catch (e) {
-      console.log("erro no fetch");
+      console.log("erro no fetch: " + e);
     }
   }
 
