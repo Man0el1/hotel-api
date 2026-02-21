@@ -18,6 +18,7 @@ const validateUserReserva = async (idUsuario, idReserva, t) => {
   })
   if (!reserva) throw new Error("Reserva não encontrada");
   if (reserva.id_conta !== idUsuario || reserva.status !== "pendente") throw new Error("Acesso negado à reserva");
+  if (reserva.expires_at < new Date()) throw new Error("Reserva expirou");
   return reserva;
 }
 

@@ -17,7 +17,7 @@ const getAvailableRooms = async (checkin, checkout, t) => {
       where: {
         check_in: { [Op.lt]: checkout },
         check_out: { [Op.gt]: checkin },
-        status: { [Op.not]: "cancelada" }
+        status: { [Op.notIn]: ["cancelada", "expirada"] }
       },
       include: {
         model: Quarto,
@@ -153,13 +153,16 @@ export const createPreConfirmation = async (req, res) => {
       }
     };
 
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); //15 minutos
+
     try {
       const reserva = await Reserva.create({
         id_conta: req.user.id,
         check_in: checkin,
         check_out: checkout,
         valor_total: valorTotal,
-        status: "pendente"
+        status: "pendente",
+        expires_at: expiresAt
       }, { transaction: t });
 
       await reserva.addQuartos([...quartosSelecionados], { transaction: t });

@@ -2,12 +2,15 @@ import express from 'express';
 import sequelize from './src/database/sequelize.js';
 import routes from './src/routes.js';
 import cors from 'cors';
+import { startAllJobs } from "./src/jobs/index.js"
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use(routes);
+
+startAllJobs();
 
 (async () => {
   try {

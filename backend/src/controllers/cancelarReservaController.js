@@ -7,22 +7,20 @@ export const xxx = async (req, res) => {
   try {
     const idReserva = req.body;
 
-
     const reserva = await Reserva.findOne({
       where: {
         id_reserva: idReserva,
       },
-      include: {
-        model: Quarto,
-        attributes: ['id_quarto', 'tipo', 'is_smoker', 'is_front_view'],
-        through: { attributes: [] }
-      },
       transaction: t
     })
-    if (!reserva) throw new Error("Reserva não encontrada");
-    if (reserva.id_conta !== idUsuario || reserva.status !== "pendente") throw new Error("Acesso negado à reserva");
+    if (!reserva) throw new Error("Reserva não existe");
+    if (reserva.id_conta !== req.user.id) throw new Error("Usuario não possui acesso");
+
+    reserva.status = "cancelada";
+    await reserva.save({ transaction: t });
+
     await t.commit();
-    return res.status(200).json({ message: "Reserva concluida!" });
+    return res.status(200).json({ message: "Reserva cancelada!" });
   } catch (e) {
     await t.rollback();
     return res.status(500).json({ message: "Erro: " + e.message });

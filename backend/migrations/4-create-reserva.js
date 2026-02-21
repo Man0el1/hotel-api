@@ -29,9 +29,13 @@ export async function up(queryInterface, Sequelize) {
       defaultValue: 0.00
     },
     status: {
-      type: Sequelize.ENUM("pendente", "confirmada", "concluida", "cancelada"),
+      type: Sequelize.STRING, //("pendente", "confirmada", "concluida", "expirada", "cancelada"),
       allowNull: false,
       defaultValue: "pendente"
+    },
+    expires_at: {
+      type: Sequelize.DATE,
+      allowNull: true
     }
   });
 

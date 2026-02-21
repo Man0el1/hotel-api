@@ -29,7 +29,7 @@ export default function Perfil() {
       })
       let data = await response.json();
       if (response.status === 200) {
-        //
+        window.location.reload();
       }
     } catch(e) {
       alert("erro no fetch: " + e);
