@@ -29,6 +29,7 @@ export default function Perfil() {
       })
       let data = await response.json();
       if (response.status === 200) {
+        alert(data.message);
         window.location.reload();
       }
     } catch(e) {
@@ -75,7 +76,7 @@ export default function Perfil() {
 
   const showUserBookings = () => {
     return(
-      reservas.map(reserva => (
+      [...reservas].reverse().map(reserva => (
         <div key={reserva.id_reserva} className="bookingCard">
           <p><strong>Data de entrada:</strong> {new Date(reserva.check_in).toLocaleDateString('pt-BR')}</p>
           <p><strong>Data de saída:</strong> {new Date(reserva.check_out).toLocaleDateString('pt-BR')}</p>

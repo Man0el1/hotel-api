@@ -15,8 +15,20 @@ export const startConcluirReservasJob = () => {
         {status: "concluida"},
         {
           where: {
+            status: {
+              [Op.in]: ["confirmada", "ativa"]
+            },
+            check_out: {[Op.lte]: new Date() }
+          }
+        }
+      );
+
+      await Reserva.update(
+        {status: "ativa"},
+        {
+          where: {
             status: "confirmada",
-            check_out: {[Op.lt]: new Date() }
+            check_in: {[Op.lte]: new Date() }
           }
         }
       )

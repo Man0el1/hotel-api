@@ -29,7 +29,7 @@ export async function up(queryInterface, Sequelize) {
       defaultValue: 0.00
     },
     status: {
-      type: Sequelize.STRING, //("pendente", "confirmada", "concluida", "expirada", "cancelada"),
+      type: Sequelize.STRING, //("pendente", "confirmada", "ativa", "concluida", "expirada", "cancelada"),
       allowNull: false,
       defaultValue: "pendente"
     },

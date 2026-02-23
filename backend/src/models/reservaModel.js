@@ -39,7 +39,7 @@ export const Reserva = sequelize.define('Reserva', {
     defaultValue: 0.00
   },
   status: {
-    type: DataTypes.STRING, //"pendente", "confirmada", "concluida", "expirada", "cancelada"
+    type: DataTypes.STRING, //"pendente", "confirmada", "ativa", "concluida", "expirada", "cancelada"
     defaultValue: "pendente"
   },
   expires_at: {
