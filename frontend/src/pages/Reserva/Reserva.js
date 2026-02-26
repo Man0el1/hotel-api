@@ -175,7 +175,12 @@ export default function Reserva() {
   }
 
   const submitPreConfirmation = async (e) => {
+    let x = 0
+    tiposDeQuarto.forEach(quarto => {
+      if (quarto.contador !== 0) x = 1
+    })
     try {
+      if (x === 0) throw new Error("Selecione pelo menos 1 quarto")
       let response = await fetch("http://localhost:8080/reserva/pre-confirmacao", {
         method: "POST",
         headers: {
@@ -192,7 +197,7 @@ export default function Reserva() {
         alert(data.message);
       }
     } catch (e) {
-      console.log("erro no fetch");
+      console.log("erro: e");
     }
   }
 

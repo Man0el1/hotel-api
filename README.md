@@ -1,2 +1,1 @@
-npx sequelize-cli db:migrate
-npx sequelize-cli db:seed:all
+Sistema de booking para o Hotel Aurora Atlântica (fictício), desenvolvido em Javascript, utilizando Node.js e Express para o backend, e React para o frontend. O sistema permite aos usuários reservar quartos, visualizar disponibilidade e gerenciar suas reservas de forma eficiente.
