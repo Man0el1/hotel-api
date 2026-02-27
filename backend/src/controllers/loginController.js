@@ -7,10 +7,10 @@ export const accountExists = async (req, res) => {
     const {email, senha} = req.body;
 
     const conta = await Conta.findOne({where: {email: email}})
-    if (!conta) return res.status(403).json({message: "Email."});
+    if (!conta) return res.status(403).json({message: "Email necessário."});
 
     const senhaCorreta = await bcrypt.compare(senha, conta.senha);
-    if (!senhaCorreta) return res.status(403).json({message: "senha errada."});
+    if (!senhaCorreta) return res.status(403).json({message: "Senha errada."});
 
     const token = jwt.sign(
       { id: conta.id_conta },

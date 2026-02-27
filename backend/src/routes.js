@@ -9,15 +9,14 @@ import { getAvalibility } from './controllers/reservaController.js'
 import { createPreConfirmation } from './controllers/reservaController.js'
 import { getCurrentDate } from './controllers/dataController.js'
 import { getReservaInfo, submitReserva } from './controllers/confirmarReservaController.js'
-import { xxx } from './controllers/cancelarReservaController.js'
+import { cancelReserva } from './controllers/cancelarReservaController.js'
 
 //middlewares
-import { verifyToken } from './middlewares/verifyToken.js';
+import { checkToken } from './middlewares/checkToken.js';
+import { requireToken } from './middlewares/requireToken.js';
 import { blockLoggedIn } from './middlewares/blockLoggedIn.js';
-import { get } from 'http';
 
-//routes
-//route.get('/', )
+route.use(checkToken);
 
 route.post('/login/entry', blockLoggedIn, accountExists);
 
@@ -25,18 +24,16 @@ route.post('/register/create', blockLoggedIn, registerAccount);
 
 route.post('/reserva/disponibilidade', getAvalibility);
 
-route.post('/reserva/pre-confirmacao', verifyToken, createPreConfirmation);
+route.post('/reserva/pre-confirmacao', requireToken, createPreConfirmation);
 
-route.get('/perfil', verifyToken, getProfileInfo);
-
-route.post('/cancelar-reserva', verifyToken, xxx)
+route.get('/perfil', requireToken, getProfileInfo);
 
 route.get('/dataAtual', getCurrentDate);
 
-route.get('/confirmar-reserva/:idReserva', verifyToken, getReservaInfo);
+route.post('/cancelar-reserva', requireToken, cancelReserva);
 
-route.get('/confirmar-reserva/:idReserva/submit', verifyToken, submitReserva);
+route.get('/confirmar-reserva/:idReserva', requireToken, getReservaInfo);
 
-//route.post('/perfil', verifyToken, /*remover token*/);
+route.get('/confirmar-reserva/:idReserva/submit', requireToken, submitReserva);
 
 export default route;

@@ -2,7 +2,7 @@ import { Op } from "sequelize";
 import { Reserva } from "../models/reservaModel.js";
 import sequelize from "../database/sequelize.js";
 
-export const xxx = async (req, res) => {
+export const cancelReserva = async (req, res) => {
   const t = await sequelize.transaction();
   try {
     const idReserva = req.body;
