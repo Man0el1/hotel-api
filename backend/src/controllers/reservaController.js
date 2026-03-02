@@ -4,14 +4,31 @@ import { Reserva } from "../models/reservaModel.js";
 import { ReservaQuarto } from '../models/reservaQuartoModel.js';
 import sequelize from "../database/sequelize.js";
 
+const parseDateLocal = (dateString) => {
+  const [year, month, day] = dateString.split("-");
+  return new Date(year, month - 1, day);
+};
+
 const getAvailableRooms = async (checkin, checkout, t) => {
   try {
     if (!checkin || !checkout) throw new Error("Check-in e check-out são obrigatórios");
     if (new Date(checkout) <= new Date(checkin)) throw new Error("Check-out deve ser depois do check-in");
 
+    const tiposExistentes = await Quarto.findAll({
+      attributes: ['tipo'],
+      group: ['tipo'],
+      transaction: t
+    });
+
     const disponibilidade = {};
     const disponibilidadeFumante = {};
     const disponibilidadeFrente = {};
+
+    tiposExistentes.forEach(q => {
+      disponibilidade[q.tipo] = 0;
+      disponibilidadeFumante[q.tipo] = 0;
+      disponibilidadeFrente[q.tipo] = 0;
+    });
 
     const reservasOcupadas = await Reserva.findAll({
       where: {
@@ -80,7 +97,11 @@ export const createPreConfirmation = async (req, res) => {
     const { checkin, checkout, tiposDeQuarto } = req.body;
     let quartosSelecionados = new Set();
     let valorTotal = 0;
-    const dias = Math.round((new Date(checkout) - new Date(checkin)) / 86400000);
+    const checkinDate = parseDateLocal(checkin);
+    const checkoutDate = parseDateLocal(checkout);
+    const dias = Math.ceil(
+      (checkoutDate - checkinDate) / 86400000
+    );
 
     const [
       disponibilidade,
@@ -88,8 +109,6 @@ export const createPreConfirmation = async (req, res) => {
       disponibilidadeFrente,
       quartosDisponiveis,
     ] = await getAvailableRooms(checkin, checkout, t);
-
-    let idsDisponiveis = quartosDisponiveis.map(quarto => quarto.id_quarto);
 
     tiposDeQuarto.forEach((quarto) => {
       if (
@@ -105,61 +124,72 @@ export const createPreConfirmation = async (req, res) => {
       };
     });
 
+    const quartosPorTipo = {};
+
+  quartosDisponiveis.forEach(q => {
+    if (!quartosPorTipo[q.tipo]) {
+      quartosPorTipo[q.tipo] = {
+        frente: [],
+        fumante: [],
+        normal: []
+      };
+    }
+
+    if (q.is_front_view) {
+      quartosPorTipo[q.tipo].frente.push(q);
+    } else if (q.is_smoker) {
+      quartosPorTipo[q.tipo].fumante.push(q);
+    } else {
+      quartosPorTipo[q.tipo].normal.push(q);
+    }
+  });
+
     for (const quarto of tiposDeQuarto) {
-      while (quarto.contador > 0) {
 
-        while (quarto.contadorFumante > 0) {
-          const quartoFumante = quartosDisponiveis.find(
-            q => idsDisponiveis.includes(q.id_quarto) && q.tipo === quarto.tipo && q.is_smoker
-          );
-          if (!quartoFumante) throw new Error("Sem quartos suficientes 1");
-          quartosSelecionados.add(quartoFumante.id_quarto);
-          idsDisponiveis = idsDisponiveis.filter( id => id !== quartoFumante.id_quarto );
+      const grupo = quartosPorTipo[quarto.tipo];
 
-          quarto.contadorFumante--;
-          quarto.contador--;
-        }
-
-        while (quarto.contadorFrente > 0) {
-          const quartoFrente = quartosDisponiveis.find(
-            q => idsDisponiveis.includes(q.id_quarto) && q.tipo === quarto.tipo && q.is_front_view
-          );
-          if (!quartoFrente) throw new Error("Sem quartos suficientes 2");
-          quartosSelecionados.add(quartoFrente.id_quarto);
-          idsDisponiveis = idsDisponiveis.filter( id => id !== quartoFrente.id_quarto );
-
-          quarto.contadorFrente--;
-          quarto.contador--;
-        }
-
-        if (quarto.contador <= 0) break;
-        const temQuartoSemVista = idsDisponiveis.some(id => {
-          const q = quartosDisponiveis.find(x => x.id_quarto === id);
-          return q.tipo === quarto.tipo && !q.is_front_view;
-        });
-
-        const quartoNormal = quartosDisponiveis.find(q =>
-          idsDisponiveis.includes(q.id_quarto)
-          && q.tipo === quarto.tipo
-          && !(q.is_smoker)
-          && (!q.is_front_view || temQuartoSemVista)
-        );
-
-        if (!quartoNormal) throw new Error("Sem quartos suficientes 3");
-        quartosSelecionados.add(quartoNormal.id_quarto);
-        idsDisponiveis = idsDisponiveis.filter( id => id !== quartoNormal.id_quarto );
-
-        quarto.contador--;
+      for (let i = 0; i < quarto.contadorFrente; i++) {
+        const selecionado = grupo.frente.pop();
+        if (!selecionado) throw new Error("Sem quartos frente suficientes");
+        quartosSelecionados.add(selecionado.id_quarto);
       }
-    };
+
+      for (let i = 0; i < quarto.contadorFumante; i++) {
+        const selecionado = grupo.fumante.pop();
+        if (!selecionado) throw new Error("Sem quartos fumante suficientes");
+        quartosSelecionados.add(selecionado.id_quarto);
+      }
+
+      const restantes = quarto.contador - quarto.contadorFrente - quarto.contadorFumante;
+
+      for (let i = 0; i < restantes; i++) {
+        let selecionado = null;
+
+        if (grupo.normal.length > 0) {
+          selecionado = grupo.normal.pop();
+        }
+        else if (grupo.fumante.length > 0) {
+          selecionado = grupo.fumante.pop();
+        }
+        else if (grupo.frente.length > 0) {
+          selecionado = grupo.frente.pop();
+        }
+
+        if (!selecionado) {
+          throw new Error("Sem quartos suficientes");
+        }
+
+        quartosSelecionados.add(selecionado.id_quarto);
+      }
+    }
 
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); //15 minutos
 
     try {
       const reserva = await Reserva.create({
         id_conta: req.user.id,
-        check_in: checkin,
-        check_out: checkout,
+        check_in: checkinDate,
+        check_out: checkoutDate,
         valor_total: valorTotal,
         status: "pendente",
         expires_at: expiresAt

@@ -1,5 +1,6 @@
 import React, {useEffect, useState } from "react";
 import { useParams} from "react-router-dom";
+import fetchProtected from "../../services/fetchProtected";
 
 import './ConfirmarReserva.css'
 
@@ -43,21 +44,17 @@ export default function ConfirmarReserva() {
 
   const showBookingInfo = async () => {
     try {
-      let response = await fetch("http://localhost:8080/confirmar-reserva/" + params.idReserva, {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        }
+      let response = await fetchProtected("http://localhost:8080/confirmar-reserva/" + params.idReserva, {
+        method: "GET"
       });
       let data = await response.json();
-      console.log(data.reserva);
-      if (response.status === 200) {
-       setBookingInfo(showUserContent(data.reserva));
-      } else {
-        alert(data.message);
+      if (!response.ok) {
         window.location.href = "http://localhost:3000/404";
+        return;
       }
+
+      setBookingInfo(showUserContent(data.reserva));
+
     } catch (e) {
       console.log("erro no fetch" + e);
     }
@@ -65,20 +62,13 @@ export default function ConfirmarReserva() {
 
   const handleSubmit = async (e) => {
     try {
-      let response = await fetch("http://localhost:8080/confirmar-reserva/" + params.idReserva + "/submit", {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        }
+      let response = await fetchProtected( "http://localhost:8080/confirmar-reserva/" + params.idReserva + "/submit", {
+        method: "GET"
       });
-      let data = await response.json();
-      if (response.status === 200) {
-        alert("Reserva confirmada com sucesso!");
-        window.location.href = "http://localhost:3000/perfil/";
-      } else {
-        alert(data.message);
-      }
+      if (!response.ok) return;
+
+      window.location.href = "http://localhost:3000/perfil/";
+
     } catch (e) {
       console.log("erro no fetch: " + e);
     }

@@ -1,5 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
+import fetchProtected from "../../services/fetchProtected";
 
 import './Perfil.css'
 
@@ -11,27 +12,22 @@ export default function Perfil() {
 
   useEffect(() => {
     if (!localStorage.getItem('token')) {
-      alert("você já não está logado");
-      window.location.href = "/";
+      alert("Faça login primeiro!");
+      window.location.href = "/login";
     }
     getUserInfo();
   }, []);
 
   const handleCancelation = async (idReserva) => {
     try {
-      let response = await fetch("http://localhost:8080/cancelar-reserva/", {
+      let response = await fetchProtected("http://localhost:8080/cancelar-reserva/", {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
         body: JSON.stringify({idReserva})
       })
-      let data = await response.json();
-      if (response.status === 200) {
-        alert(data.message);
-        window.location.reload();
-      }
+      if (!response.ok) return;
+
+      window.location.reload();
+
     } catch(e) {
       alert("erro no fetch: " + e);
     }
@@ -39,19 +35,16 @@ export default function Perfil() {
 
   const getUserInfo = async () => {
     try {
-      let response = await fetch("http://localhost:8080/perfil", {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        }
+      let response = await fetchProtected("http://localhost:8080/perfil", {
+        method: "GET"
       })
       let data = await response.json();
-      if (response.status === 200) {
-        setUser(data.conta);
-        setEndereco(data.endereco);
-        setReservas(data.reservas);
-      }
+      if (!response.ok) return;
+      
+      setUser(data.conta);
+      setEndereco(data.endereco);
+      setReservas(data.reservas);
+
     } catch(e) {
       alert("erro no fetch: " + e);
     }
@@ -89,7 +82,7 @@ export default function Perfil() {
           </a>}
           {reserva.status === "confirmada" && <button 
             className="p-3 mb-2 bg-danger text-white" 
-            onClick={handleCancelation(reserva.id_reserva)}>Cancelar reserva
+            onClick={() => handleCancelation(reserva.id_reserva)}>Cancelar reserva
           </button>}
         </div>
       ))

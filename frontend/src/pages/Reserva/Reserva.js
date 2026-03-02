@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from "react";
 import './Reserva.css'
 import QuartoModal from "../../components/Modal/Modal";
+import fetchProtected from "../../services/fetchProtected";
 
 export default function Reserva() {
 
@@ -62,15 +63,20 @@ export default function Reserva() {
         headers: {
           "Content-Type": "application/json"
         }
-      });;
+      });
       let data = await response.json();
-      if (response.status === 200) {
-        setDataAtual(data.dataAtual);
-        setDataAnoSeguinte(data.dataAnoSeguinte);
-      } else {
+      if (!response.ok) {        
         //lembrar de remover, indicar erro depois para so carregar se o servidor responder
         setDataAtual(new Date().toISOString().split('T')[0]);
+        return;
       }
+
+      const hoje = new Date(data.dataAtual);
+      hoje.setDate(hoje.getDate() + 1);
+
+      setDataAtual(hoje.toISOString().split('T')[0]);
+      setDataAnoSeguinte(data.dataAnoSeguinte);
+      
     } catch (e) {
       setDataAtual(new Date().toISOString().split('T')[0]);
     };
@@ -154,21 +160,19 @@ export default function Reserva() {
         body: JSON.stringify({checkin, checkout})
       });
       let data = await response.json();
-      if (response.status === 200) {
-        console.log(data);
-        setQuantMaxQuartos(data.disponibilidade)
-        setQuantMaxQuartosFumante(data.disponibilidadeFumante)
-        setQuantMaxQuartosFrente(data.disponibilidadeFrente)
-        setIsButtonDisabled(false);
-        setPrecoTotal(0);
+      if (!response.ok) return;
 
-        tiposDeQuarto.forEach(quarto => {
-          quarto.contador = 0;
-        });
+      console.log(data);
+      setQuantMaxQuartos(data.disponibilidade)
+      setQuantMaxQuartosFumante(data.disponibilidadeFumante)
+      setQuantMaxQuartosFrente(data.disponibilidadeFrente)
+      setIsButtonDisabled(false);
+      setPrecoTotal(0);
 
-      } else {
-        alert(data.message);
-      }
+      tiposDeQuarto.forEach(quarto => {
+        quarto.contador = 0;
+      });
+
     } catch (e) {
       console.log("erro no fetch");
     }
@@ -181,23 +185,17 @@ export default function Reserva() {
     })
     try {
       if (x === 0) throw new Error("Selecione pelo menos 1 quarto")
-      let response = await fetch("http://localhost:8080/reserva/pre-confirmacao", {
+      let response = await fetchProtected("http://localhost:8080/reserva/pre-confirmacao", {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
         body: JSON.stringify({checkin, checkout, tiposDeQuarto})
       });
       let data = await response.json();
-      if (response.status === 200) {
-        alert("reserva pré-confirmada com sucesso! id da reserva: " + data.idReserva);
-        window.location.href = "http://localhost:3000/confirmar-reserva/" + data.idReserva;
-      } else {
-        alert(data.message);
-      }
+      if (!response.ok) return;
+
+      window.location.href = "http://localhost:3000/confirmar-reserva/" + data.idReserva;
+
     } catch (e) {
-      console.log("erro: e");
+      console.log("erro: " + e);
     }
   }
 

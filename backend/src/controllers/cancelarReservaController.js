@@ -5,7 +5,7 @@ import sequelize from "../database/sequelize.js";
 export const cancelReserva = async (req, res) => {
   const t = await sequelize.transaction();
   try {
-    const idReserva = req.body;
+    const {idReserva} = req.body;
 
     const reserva = await Reserva.findOne({
       where: {

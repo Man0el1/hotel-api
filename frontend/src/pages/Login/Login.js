@@ -23,13 +23,12 @@ export default function Login() {
         body: JSON.stringify({email, senha})
       });
       let data = await response.json();
-      if (response.status === 200) {
-        localStorage.setItem("token", data.token); 
-        alert(data.message);
-        window.location.href = "/";
-      } else {
-        alert(data.message);
-      }
+      alert(data.message)
+      if (!response.ok) return;
+
+      localStorage.setItem("token", data.token);
+      window.location.href = "/";
+      
     } catch (e) {
       console.log("erro no fetch");
     }

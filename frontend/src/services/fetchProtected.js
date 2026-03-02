@@ -1,4 +1,4 @@
-async function fetchProtected(url, options = {}) {
+export default async function fetchProtected(url, options = {}) {
 
   const response = await fetch(url, {
     ...options,
@@ -14,5 +14,10 @@ async function fetchProtected(url, options = {}) {
     window.location.href = "/login";
     return;
   }
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message);
+  }
+
   return response;
 }

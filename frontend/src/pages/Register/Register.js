@@ -22,7 +22,7 @@ export default function Register() {
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
-      alert("você já está logado");
+      alert("Você já está logado");
       window.location.href = "/";
     }
   }, []);
@@ -56,16 +56,10 @@ export default function Register() {
       });
       let data = await response.json();
 
-      if (response.status === 201) {
-        localStorage.setItem("token", data.token);
-        alert(data.message);
-        window.location.href = "/";
-      } else {
-        alert(data.message);
-        if (response.status === 403) {
-          window.location.href = "/";
-        }
-      }
+      if (response.ok) localStorage.setItem("token", data.token);
+
+      window.location.href = "/";
+
     } catch (e) {
       alert("erro no fetch: " + e);
     }

@@ -15,7 +15,8 @@ const validateUserReserva = async (idUsuario, idReserva, t) => {
       through: { attributes: [] }
     },
     transaction: t
-  })
+  });
+
   if (!reserva) throw new Error("Reserva não encontrada");
   if (reserva.id_conta !== idUsuario || reserva.status !== "pendente") throw new Error("Acesso negado à reserva");
   if (reserva.expires_at < new Date()) throw new Error("Reserva expirou");
@@ -23,13 +24,12 @@ const validateUserReserva = async (idUsuario, idReserva, t) => {
 }
 
 export const getReservaInfo = async (req, res) => {
-  const t = await sequelize.transaction();
   try {
     const idToken = req.user.id;
     const idReserva = req.params.idReserva;
     if (!idReserva) return res.status(400).json({ message: "ID da reserva é obrigatório" });
 
-    const reserva = await validateUserReserva(idToken, idReserva, t);
+    const reserva = await validateUserReserva(idToken, idReserva);
     return res.status(200).json({ reserva });
   } catch (e) {
     return res.status(500).json({ message: "Erro: " + e.message });
@@ -43,7 +43,7 @@ export const submitReserva = async (req, res) => {
     const idReserva = req.params.idReserva;
     if (!idReserva) return res.status(400).json({ message: "ID da reserva é obrigatório" });
 
-    const reserva = await validateUserReserva(idToken, idReserva);
+    const reserva = await validateUserReserva(idToken, idReserva, t);
     await reserva.update({ status: "confirmada" }, { transaction: t });
 
     await t.commit();
